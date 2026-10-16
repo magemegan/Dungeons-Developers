@@ -2787,6 +2787,7 @@ GameObject:
   - component: {fileID: 1064482147}
   - component: {fileID: 1064482146}
   - component: {fileID: 1064482150}
+  - component: {fileID: 1064482151}
   m_Layer: 0
   m_Name: GreedyGambler
   m_TagString: Untagged
@@ -2820,7 +2821,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &1064482147
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2914,7 +2915,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.9391003, g: 0.96226406, b: 0.38775864, a: 1}
@@ -2954,6 +2955,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeea59b157e6bc84aa63d8d8dc57ff7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GreedyGambler
+--- !u!114 &1064482151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064482145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 921f3ddbfb5e3a440a951b8dfb01cf3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MovementTemplate
 --- !u!1 &1191477938
 GameObject:
   m_ObjectHideFlags: 0

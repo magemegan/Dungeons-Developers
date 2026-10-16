@@ -3,15 +3,15 @@ using UnityEngine;
 public class AgentSensor : MonoBehaviour
 {
     public float detectionDistance = 1f;
-    public LayerMask obstacleLayer;
+    //public LayerMask obstacleLayer;
 
     public bool IsBlocked(Vector2 direction)
     {
         RaycastHit2D hit = Physics2D.Raycast(
             transform.position,
             direction,
-            detectionDistance,
-            obstacleLayer
+            detectionDistance
+            //obstacleLayer
         );
 
         return hit.collider != null;
