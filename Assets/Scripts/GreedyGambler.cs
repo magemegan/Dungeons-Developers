@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class GreedyGambler : MonoBehaviour
 {
@@ -30,15 +31,30 @@ public class GreedyGambler : MonoBehaviour
     // move toward exit
     //
     //     END WHILE
-    
-    public static RaycastHit2D CircleHit;
+   
+    private AgentMovement movement;
+    private AgentSensor sensor;
+
     void Start()
     {
-        
+        movement = GetComponent<AgentMovement>();
+        sensor = GetComponent<AgentSensor>();
     }
 
     void Update()
     {
-        
+        if (movement.IsMoving)
+            return;
+
+        // Example decision: try moving right
+        if (!sensor.IsBlocked(Vector2.right))
+        {
+            movement.Move(Vector3.right);
+        }
+        else
+        {
+            Debug.Log("Right is blocked. Choose another action.");
+        }
     }
+    
 }

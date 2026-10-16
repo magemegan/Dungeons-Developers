@@ -22,6 +22,7 @@ public class MovementTemplate : MonoBehaviour
         if (Keyboard.current.dKey.isPressed && !isMoving)
             StartCoroutine(MovePlayer(Vector3.right));
     }
+    
 
     private IEnumerator MovePlayer(Vector3 direction)
     {
