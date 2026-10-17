@@ -256,6 +256,63 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!1 &624136126
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 624136129}
+  - component: {fileID: 624136128}
+  - component: {fileID: 624136127}
+  m_Layer: 0
+  m_Name: Game Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &624136127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 624136126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2e6d327d76242d4c9210d8601fbc5fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatManager
+--- !u!114 &624136128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 624136126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f26a2d895f2125746b4ef8767e63ca79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
+--- !u!4 &624136129
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 624136126}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.47133, y: -12.08327, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &970316546
 GameObject:
   m_ObjectHideFlags: 0
@@ -266,9 +323,13 @@ GameObject:
   m_Component:
   - component: {fileID: 970316548}
   - component: {fileID: 970316547}
+  - component: {fileID: 970316552}
+  - component: {fileID: 970316551}
+  - component: {fileID: 970316550}
+  - component: {fileID: 970316549}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -341,12 +402,69 @@ Transform:
   m_GameObject: {fileID: 970316546}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.51, y: -16.61, z: 0}
+  m_LocalPosition: {x: 13.47, y: -15.54, z: 0}
   m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &970316549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 970316546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1606701bcdf6b24489d414c5169d8055, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatController
+  movementRange: 5
+--- !u!114 &970316550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 970316546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecbadbbeb61233841bb323616c1159ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DetectorScript
+  tilemap: {fileID: 1152023464}
+--- !u!114 &970316551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 970316546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33c395c28673b8c4495306d2d35379dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatScript
+  adventurer: 0
+  health: 1
+  speed: 5
+  perception: 5
+--- !u!114 &970316552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 970316546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4928af913c77f441b84d87afbc85d13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MovementScript
+  tilemap: {fileID: 1152023464}
+  target: {fileID: 0}
+  timeToMove: 0.2
 --- !u!1 &1096480172
 GameObject:
   m_ObjectHideFlags: 0
@@ -357,29 +475,17 @@ GameObject:
   m_Component:
   - component: {fileID: 1096480175}
   - component: {fileID: 1096480174}
-  - component: {fileID: 1096480173}
   - component: {fileID: 1096480176}
+  - component: {fileID: 1096480179}
+  - component: {fileID: 1096480178}
+  - component: {fileID: 1096480177}
   m_Layer: 0
-  m_Name: Player
-  m_TagString: Untagged
+  m_Name: Adventurer
+  m_TagString: Adventurer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1096480173
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1096480172}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 921f3ddbfb5e3a440a951b8dfb01cf3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MovementTemplate
-  tilemap: {fileID: 1152023464}
-  timeToMove: 0.2
 --- !u!212 &1096480174
 SpriteRenderer:
   serializedVersion: 2
@@ -467,8 +573,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AutomaticMovement
   tilemap: {fileID: 1152023464}
-  target: {fileID: 970316548}
+  target: {fileID: 0}
   timeToMove: 0.2
+--- !u!114 &1096480177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1096480172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1606701bcdf6b24489d414c5169d8055, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatController
+  movementRange: 5
+--- !u!114 &1096480178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1096480172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecbadbbeb61233841bb323616c1159ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DetectorScript
+  tilemap: {fileID: 1152023464}
+--- !u!114 &1096480179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1096480172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33c395c28673b8c4495306d2d35379dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatScript
+  adventurer: 1
+  health: 1
+  speed: 5
+  perception: 5
 --- !u!1 &1152023461
 GameObject:
   m_ObjectHideFlags: 0
@@ -5018,3 +5166,4 @@ SceneRoots:
   - {fileID: 1096480175}
   - {fileID: 970316548}
   - {fileID: 1685066424}
+  - {fileID: 624136129}
