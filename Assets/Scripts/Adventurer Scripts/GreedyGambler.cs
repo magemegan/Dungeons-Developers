@@ -32,29 +32,15 @@ public class GreedyGambler : MonoBehaviour
     //
     //     END WHILE
    
-    private AgentMovement movement;
-    private AgentSensor sensor;
-
+   
     void Start()
     {
-        movement = GetComponent<AgentMovement>();
-        sensor = GetComponent<AgentSensor>();
+       
     }
 
     void Update()
     {
-        if (movement.IsMoving)
-            return;
-
-        // Example decision: try moving right
-        if (!sensor.IsBlocked(Vector2.right))
-        {
-            movement.Move(Vector3.right);
-        }
-        else
-        {
-            Debug.Log("Right is blocked. Choose another action.");
-        }
+        
     }
     
 }
