@@ -4,9 +4,9 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - Loot
   - Enemy
   - Adventurer
+  - Chest
   layers:
   - Default
   - TransparentFX
@@ -14,7 +14,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Loot
   - 
   - 
   - 

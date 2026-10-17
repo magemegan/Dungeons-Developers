@@ -1,46 +1,78 @@
+using System;
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Tilemaps;
 
 public class GreedyGambler : MonoBehaviour
 {
+    [SerializeField] private int lootRadius = 2;
+    public LayerMask lootLayer;
+    [SerializeField] private Tilemap floorTilemap;
+    private Vector3Int tilePosition;
+    private int tilesToChest;
     
-    // WHILE the agent has not reached the exit
-    // Sense the environment
-    //     Find nearby:
-    // loot, enemies, obstacles, exit, and available spells
-    //     IF the agent’s health is very low
-    // move toward the exit 
-    // CONTINUE
-    //     FOR each available loot item:
-    // Determine:
-    // loot value, distance to loot, enemy danger, chance of successfully obtaining loot, risk/probable health if obtaining the loot 
-    //     Calculate utility:
-    // utility = (loot value * chance of success)
-    //
-    // Select the loot/action with the highest utility
-    //     IF the selected action requires a chance-based spell:
-    // use the spell 
-    //     IF the spell succeeds:
-    // continue toward the loot
-    //     ELSE 
-    // recalculate the utility of available actions
-    // ELSE
-    //     move toward the selected loot
-    // IF the dungeon has been sufficiently explored 
-    //     OR the agent has enough valuable loot/inventory full
-    // move toward exit
-    //
-    //     END WHILE
-   
-   
-    void Start()
+    private AgentState state;
+
+    private MovementScript movement;
+    private StatScript stats;
+    private int speed;
+
+    public enum AgentState
     {
-       
+        PlayerControlled,
+        Combat,
+        MovingToLoot,
+        CollectingLoot,
+        Attacking
+    }
+
+    void CheckForLoot()
+    {
+        Collider2D[] nearbyLoot = Physics2D.OverlapCircleAll(transform.position, lootRadius, lootLayer);
+
+        foreach (Collider2D loot in nearbyLoot)
+        {
+            Vector3 lootPosition = loot.transform.position;
+            tilePosition = floorTilemap.WorldToCell(lootPosition);
+            
+            tilesToChest = movement.GetTilesToChest(tilePosition);
+            
+            Debug.Log("Detected loot: " + loot.name);
+            Debug.Log("Loot position: " + lootPosition);
+        }
+    }
+
+    private void Start()
+    {
+        movement = GetComponent<MovementScript>();
+        stats = GetComponent<StatScript>();
+        speed = stats.GetSpeed();
+        
+        
+        state = AgentState.PlayerControlled;
     }
 
     void Update()
     {
+        if (GameManager.Instance.CurrentState == GameManager.GameState.Combat)
+        {
+            CheckForLoot();
+        }
+    }
+
+    void Move()
+    {
+        movement.MoveToChest(tilePosition);
+    }
+
+    void Attack()
+    {
         
     }
-    
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, lootRadius);
+    }
 }

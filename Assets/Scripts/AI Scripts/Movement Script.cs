@@ -354,4 +354,39 @@ public class MovementScript: MonoBehaviour
         isMoving = false;
         currentPath = null;
     }
+    
+    // used for the greedy gambler within combat
+    public void MoveToChest(Vector3Int chestCell)
+    {
+        // Create a target if one doesn't exist.
+        if (target == null)
+        {
+            GameObject targetObject = new GameObject("Target");
+            target = targetObject.transform;
+        }
+
+        target.position = tilemap.GetCellCenterWorld(chestCell);
+
+        currentPath = null;
+        pathIndex = 0;
+    }
+    // also used for the greedy gambler
+    public int GetTilesToChest(Vector3Int chestCell)
+    {
+        // Find the tile the adventurer is currently on
+        Vector3Int startCell =
+            tilemap.WorldToCell(transform.position);
+
+        // Calculate the path to the chest
+        List<Vector3Int> path = FindPath(startCell, chestCell);
+
+        // Return -1 if no path exists
+        if (path == null)
+        {
+            return -1;
+        }
+
+        // Each cell in the path represents one tile to move
+        return path.Count;
+    }
 }
