@@ -77,41 +77,6 @@ public class MovementScript: MonoBehaviour
             currentPath = null;
             target = null;
         }
-
-        //// Find tile the NPC + target are on
-        //Vector3Int currentCell = tilemap.WorldToCell(transform.position);
-        //Vector3Int targetCell = tilemap.WorldToCell(target.position);
-
-        //// Reached target
-        //if (currentCell == targetCell)
-        //{
-        //    target = null;
-        //    return;
-        //}
-
-        //// determine direction
-        //Vector3Int direction = Vector3Int.zero;
-
-        //// horizontal movement first
-        //if (currentCell.x < targetCell.x)
-        //{
-        //    direction = Vector3Int.right;
-        //}
-        //else if (currentCell.x > targetCell.x)
-        //{
-        //    direction = Vector3Int.left;
-        //}
-        //else if (currentCell.y < targetCell.y)
-        //{
-        //    direction = Vector3Int.up;
-        //}
-        //else if (currentCell.y > targetCell.y)
-        //{
-        //    direction = Vector3Int.down;
-        //}
-
-        //// Start moving toward the target.
-        //StartCoroutine(MoveDirection(direction));
     }
 
     private void SetTargetFromMouse()
