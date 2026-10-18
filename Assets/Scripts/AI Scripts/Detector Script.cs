@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using static GameManager;
@@ -14,7 +15,11 @@ public class DetectorScript : MonoBehaviour
     {
         stats = GetComponent<StatScript>();
         combatDistance = stats.GetPerceptiom();
-        adventurer = stats.GetAdventurer();
+
+        if (gameObject.CompareTag("Adventurer"))
+            adventurer = true;
+        else if (gameObject.CompareTag("Enemy"))
+            adventurer = false;
     }
 
     private void Update()
@@ -33,7 +38,14 @@ public class DetectorScript : MonoBehaviour
 
     public void CheckForEnemies()
     {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        string tag;
+
+        if (adventurer)
+            tag = "Enemy";
+        else
+            tag = "Adventurer";
+
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag(tag);
 
         Vector3Int myCell = tilemap.WorldToCell(transform.position);
 
@@ -55,5 +67,47 @@ public class DetectorScript : MonoBehaviour
     private void CheckForAdventurers()
     {
 
+    }
+
+    public GameObject GetClosestOpponent()
+    {
+        List<GameObject> combatants = CombatManager.Instance.GetCombatants();
+
+        Vector3Int myCell = tilemap.WorldToCell(transform.position);
+
+        GameObject closestEnemy = null;
+        int closestDistance = int.MaxValue;
+
+        StatScript myStats = GetComponent<StatScript>();
+        if (myStats == null)
+            return null;
+
+        foreach (GameObject combatant in combatants)
+        {
+            GameObject other = combatant.gameObject;
+            StatScript stats = other.GetComponent<StatScript>();
+            if (stats == null)
+                continue;
+
+            // Adventurers look for enemies
+            if (myStats.GetAdventurer() && stats.GetAdventurer())
+                continue;
+
+            // Enemies look for adventurers
+            if (!myStats.GetAdventurer() && !stats.GetAdventurer())
+                continue;
+
+            Vector3Int enemyCell = tilemap.WorldToCell(other.transform.position);
+
+            int distance = Mathf.Abs(myCell.x - enemyCell.x) + Mathf.Abs(myCell.y - enemyCell.y);
+
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestEnemy = other;
+            }
+        }
+
+        return closestEnemy;
     }
 }
