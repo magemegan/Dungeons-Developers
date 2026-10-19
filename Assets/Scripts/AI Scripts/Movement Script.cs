@@ -6,8 +6,11 @@ using UnityEngine.InputSystem;
 
 public class MovementScript: MonoBehaviour
 {
+    // bool
     private bool adventurer;
     private bool isMoving;
+    public bool IsSelected => selectedAdventurer == this;
+    private bool combatMoving;
 
     // Pathfinding
     private List<Vector3Int> currentPath;
@@ -19,14 +22,47 @@ public class MovementScript: MonoBehaviour
     [SerializeField] private float timeToMove = 0.2f;
     private Vector3 origPos, targetPos;
 
+    // References
     private DetectorScript detector;
     private StatScript stats;
+
+    // Adventurer selected
+    private static MovementScript selectedAdventurer;
+
+    // mouse click once per frame
+    private static int lastMouseClickFrame = -1;
+
+    // Sprite
+    [SerializeField] private Color selectedColor = Color.yellow;
+    private SpriteRenderer[] spriteRenderers;
+    private Color[] originalColors;
+
+    // Values
+    private int combatMovesRemaining;
+
+    // Getters
+    public Tilemap GetTilemap() { return tilemap; }
+    public bool GetCombatMoving() { return combatMoving; }
 
     void Awake()
     {
         detector = GetComponent<DetectorScript>();
         stats = GetComponent<StatScript>();
-        adventurer = stats.GetAdventurer();
+
+        if (gameObject.CompareTag("Adventurer"))
+            adventurer = true;
+        else if (gameObject.CompareTag("Enemy"))
+            adventurer = false;
+
+        // sprite handling
+        spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
+
+        originalColors = new Color[spriteRenderers.Length];
+
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            originalColors[i] = spriteRenderers[i].color;
+        }
     }
 
     void Start()
@@ -38,25 +74,29 @@ public class MovementScript: MonoBehaviour
 
     void Update()
     {
+        // Combat movement handled seperately
         if (GameManager.Instance.CurrentState != GameManager.GameState.Exploration)
             return;
 
-        if (Mouse.current.leftButton.wasPressedThisFrame && adventurer)
+        // Adventurers use mouse movement only
+        if (!adventurer)
+            return;
+
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame && lastMouseClickFrame != Time.frameCount)
         {
-            SetTargetFromMouse();
-        } else
-        {
-            // Enemy will occassionally move randomly
+            lastMouseClickFrame = Time.frameCount;
+            SelectAdventurer();
         }
+
+        if (selectedAdventurer != this)
+            return;
 
         if (target == null)
             return;
 
         // Create path to target
         if (currentPath == null || pathIndex >= currentPath.Count)
-        {
             CreatePath();
-        }
 
         // Already moving
         if (isMoving)
@@ -77,41 +117,113 @@ public class MovementScript: MonoBehaviour
             currentPath = null;
             target = null;
         }
+    }
 
-        //// Find tile the NPC + target are on
-        //Vector3Int currentCell = tilemap.WorldToCell(transform.position);
-        //Vector3Int targetCell = tilemap.WorldToCell(target.position);
 
-        //// Reached target
-        //if (currentCell == targetCell)
-        //{
-        //    target = null;
-        //    return;
-        //}
 
-        //// determine direction
-        //Vector3Int direction = Vector3Int.zero;
 
-        //// horizontal movement first
-        //if (currentCell.x < targetCell.x)
-        //{
-        //    direction = Vector3Int.right;
-        //}
-        //else if (currentCell.x > targetCell.x)
-        //{
-        //    direction = Vector3Int.left;
-        //}
-        //else if (currentCell.y < targetCell.y)
-        //{
-        //    direction = Vector3Int.up;
-        //}
-        //else if (currentCell.y > targetCell.y)
-        //{
-        //    direction = Vector3Int.down;
-        //}
 
-        //// Start moving toward the target.
-        //StartCoroutine(MoveDirection(direction));
+
+
+
+
+
+
+    public void SetTarget(Vector3 targetPosition)
+    {
+        if (target == null)
+        {
+            GameObject targetObject = new GameObject("AITarget");
+            target = targetObject.transform;
+        }
+
+        target.position = targetPosition;
+
+        currentPath = null;
+        pathIndex = 0;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // MOUSE CLICK HANDLING
+
+
+    private void SelectAdventurer()
+    {
+        MovementScript clickedCharacter = GetClickedCharacter();
+
+        // If character was clicked
+        if (clickedCharacter != null)
+        {
+            if (!clickedCharacter.adventurer)
+                return;
+
+            // Deselect chosen character
+            if (selectedAdventurer == clickedCharacter)
+            {
+                clickedCharacter.SetSelectionHighlight(false);
+                selectedAdventurer = null;
+
+                Debug.Log(clickedCharacter.name + " deselected.");
+            }
+            else
+            {
+                if (selectedAdventurer != null)
+                {
+                    selectedAdventurer.SetSelectionHighlight(false);
+                }
+
+                selectedAdventurer = clickedCharacter;
+                selectedAdventurer.SetSelectionHighlight(true);
+
+                Debug.Log(clickedCharacter.name + " selected.");
+            }
+
+            return;
+        }
+
+        // Clicking somewhere else on screen moves selected character
+        if (selectedAdventurer != null)
+        {
+            selectedAdventurer.SetTargetFromMouse();
+        }
+    }
+
+    private MovementScript GetClickedCharacter()
+    {
+        if (Camera.main == null || Mouse.current == null)
+            return null;
+
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+
+        Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+
+        RaycastHit2D[] hits2D = Physics2D.GetRayIntersectionAll(ray);
+
+        foreach (RaycastHit2D hit in hits2D)
+        {
+            MovementScript character =
+                hit.collider.GetComponentInParent<MovementScript>();
+
+            if (character != null)
+                return character;
+        }
+
+        return null;
     }
 
     private void SetTargetFromMouse()
@@ -141,6 +253,27 @@ public class MovementScript: MonoBehaviour
         // target on center of tile
         target.position = clickedTileCenter;
     }
+
+    private void SetSelectionHighlight(bool selected)
+    {
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            if (spriteRenderers[i] == null)
+                continue;
+
+            if (selected)
+            {
+                // selection color
+                spriteRenderers[i].color = selectedColor;
+            }
+            else
+            {
+                // original color
+                spriteRenderers[i].color = originalColors[i];
+            }
+        }
+    }
+
 
 
 
@@ -295,6 +428,68 @@ public class MovementScript: MonoBehaviour
     }
 
 
+    public void MoveTowardsCombatTarget(Vector3 targetPosition)
+    {
+        // Already moving
+        if (isMoving || combatMoving)
+            return;
+
+        if (tilemap == null)
+        {
+            Debug.LogError(name + " has no Tilemap assigned!");
+            return;
+        }
+
+        if (stats == null)
+        {
+            Debug.LogError(name + " has no StatScript!");
+            return;
+        }
+
+        // Path to target
+        Vector3Int startCell = tilemap.WorldToCell(transform.position);
+        Vector3Int targetCell = tilemap.WorldToCell(targetPosition);
+
+        List<Vector3Int> bestPath = null;
+
+        foreach (Vector3Int neighbor in GetNeighbors(targetCell))
+        {
+            if (!tilemap.HasTile(neighbor))
+                continue;
+
+            List<Vector3Int> candidatePath = FindPath(startCell, neighbor);
+
+            if (candidatePath != null &&
+                (bestPath == null || candidatePath.Count < bestPath.Count))
+            {
+                bestPath = candidatePath;
+            }
+        }
+
+        // No path
+        if (bestPath == null)
+        {
+            Debug.LogWarning(name + " could not find a path to a tile next to the target.");
+            return;
+        }
+
+        // Already next to the target
+        if (bestPath.Count == 0)
+        {
+            Debug.Log(name + " is already next to the target.");
+            return;
+        }
+
+        currentPath = bestPath;
+        pathIndex = 0;
+        combatMovesRemaining = stats.GetSpeed();
+
+        // Limit movement to the character's speed.
+        combatMoving = true;
+
+        StartCoroutine(MoveOnCombatPath());
+    }
+
 
 
 
@@ -305,6 +500,30 @@ public class MovementScript: MonoBehaviour
 
 
     // MOVEMENT
+
+
+    private IEnumerator MoveOnCombatPath()
+    {
+        while (combatMovesRemaining > 0 && currentPath != null && pathIndex < currentPath.Count)
+        {
+            Vector3Int nextCell = currentPath[pathIndex];
+            Vector3Int currentCell = tilemap.WorldToCell(transform.position);
+
+            Vector3Int direction = nextCell - currentCell;
+
+            yield return StartCoroutine(MoveDirection(direction));
+
+            combatMovesRemaining--;
+        }
+
+        combatMoving = false;
+
+        // Combat movement is finished
+        currentPath = null;
+        target = null;
+
+        Debug.Log(name + " finished combat movement.");
+    }
 
 
     private IEnumerator MoveDirection(Vector3Int direction)
@@ -344,15 +563,27 @@ public class MovementScript: MonoBehaviour
 
         pathIndex++;
 
-        detector.CheckForEnemies();
+        if (!combatMoving)
+            detector.CheckForEnemies();
     }
 
     // For getting into combat
     public void StopMovement()
     {
         StopAllCoroutines();
+
         isMoving = false;
+        target = null;
         currentPath = null;
+        combatMovesRemaining = 0;
+        target = null;
+        pathIndex = 0;
+
+        if (selectedAdventurer == this)
+        {
+            SetSelectionHighlight(false);
+            selectedAdventurer = null;
+        }
     }
     
     // used for the greedy gambler within combat

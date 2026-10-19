@@ -2,24 +2,31 @@ using UnityEngine;
 
 public class CombatController : MonoBehaviour
 {
-    [SerializeField] private int movementRange = 5;
+    //public bool turnIsActive { get; private set; }
 
-    private int remainingMovement;
+    //private AICombatBase combatBase;
 
-    public bool HasActed { get; private set; }
+    //void Awake()
+    //{
+    //    combatBase = GetComponent<AICombatBase>();
+    //}
 
-    public void StartTurn()
-    {
-        remainingMovement = movementRange;
-        HasActed = false;
+    //public void StartTurn()
+    //{
+    //    turnIsActive = true;
 
-        Debug.Log(name + " started their turn.");
-    }
+    //    Debug.Log(name + " started their turn");
 
-    public void EndTurn()
-    {
-        HasActed = true;
+    //    if (combatBase != null)
+    //        combatBase.DecideAction();
+    //    else
+    //        Debug.LogWarning(gameObject.name + " has no combat AI");
+    //}
 
-        // Tell combat manager turn has ended
-    }
+    //public void EndTurn()
+    //{
+    //    turnIsActive = false;
+
+    //    // Tell combat manager turn has ended
+    //}
 }
