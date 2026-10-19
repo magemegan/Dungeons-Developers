@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 141096936853388181}
   - component: {fileID: 393985617565588661}
   - component: {fileID: 3770242838364146284}
+  - component: {fileID: 1065959468059078308}
   m_Layer: 0
   m_Name: chest
   m_TagString: Untagged
@@ -138,3 +139,20 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1065959468059078308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7446772353885044983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d42fc85ed674b24aa3b8aeb9cc6117f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootData
+  lootObject: {fileID: 839868670025079918, guid: c8ab76dfe4845e049a22fac8e025ebe9, type: 3}
+  gridPosition: {x: 0, y: 0, z: 0}
+  value: 0
+  minValue: 5
+  maxValue: 10

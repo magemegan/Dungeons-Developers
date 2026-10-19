@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7953853147794982317}
   - component: {fileID: 6405093938114146334}
   - component: {fileID: 2762632947120811341}
+  - component: {fileID: 5181612270705471315}
   m_Layer: 0
   m_Name: coin
   m_TagString: Loot
@@ -128,3 +129,15 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0.0040358305, y: -0.020178497}
   m_Radius: 0.28207248
+--- !u!114 &5181612270705471315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 839868670025079918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99023e253f1f8bb42a1c2e355effcb17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Coin

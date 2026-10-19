@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 684620889}
   - component: {fileID: 684620895}
   - component: {fileID: 684620896}
+  - component: {fileID: 684620897}
   m_Layer: 0
   m_Name: GreedyGambler
   m_TagString: Adventurer
@@ -289,7 +290,7 @@ MonoBehaviour:
   lootLayer:
     serializedVersion: 2
     m_Bits: 64
-  floorTilemap: {fileID: 0}
+  floorTilemap: {fileID: 8329695624471161992}
 --- !u!114 &684620896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -302,12 +303,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34b1ae01a127f1b4ab82b4467f082f42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Adventurer
-  maxHealth: 100
-  currentHealth: 100
-  attackDamage: 10
-  defense: 5
-  lootCapacity: 50
-  isAlive: 1
+--- !u!61 &684620897
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684620888}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!1001 &922196525
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -648,7 +689,7 @@ Transform:
   m_GameObject: {fileID: 1738290523}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.47, y: -15.54, z: 0}
+  m_LocalPosition: {x: 10.47, y: -4.54, z: 0}
   m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -702,13 +743,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1065959468059078308, guid: db65750d6fbbe9d47be6f368b19312d7, type: 3}
+      propertyPath: maxValue
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3770242838364146284, guid: db65750d6fbbe9d47be6f368b19312d7, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3770242838364146284, guid: db65750d6fbbe9d47be6f368b19312d7, type: 3}
+      propertyPath: m_IncludeLayers.m_Bits
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 7446772353885044983, guid: db65750d6fbbe9d47be6f368b19312d7, type: 3}
       propertyPath: m_Name
       value: chest
       objectReference: {fileID: 0}
     - target: {fileID: 7446772353885044983, guid: db65750d6fbbe9d47be6f368b19312d7, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7446772353885044983, guid: db65750d6fbbe9d47be6f368b19312d7, type: 3}
       propertyPath: m_TagString

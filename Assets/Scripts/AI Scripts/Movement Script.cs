@@ -389,4 +389,27 @@ public class MovementScript: MonoBehaviour
         // Each cell in the path represents one tile to move
         return path.Count;
     }
+
+    public void MoveTowardChest(Vector3Int chestCell, int speed)
+    {
+        Vector3Int startCell =
+            tilemap.WorldToCell(transform.position);
+
+        currentPath = FindPath(startCell, chestCell);
+        pathIndex = 0;
+
+        if (currentPath == null)
+        {
+            target = null;
+            return;
+        }
+
+        int maxTilesThisTurn = Mathf.Min(speed, currentPath.Count);
+
+        if (target == null)
+        {
+            GameObject targetObject = new GameObject("Target");
+            target = targetObject.transform;
+        }
+    }
 }

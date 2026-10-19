@@ -36,6 +36,8 @@ public class GreedyGambler : MonoBehaviour
             tilePosition = floorTilemap.WorldToCell(lootPosition);
             
             tilesToChest = movement.GetTilesToChest(tilePosition);
+            // find the highest value chest then return its position
+            
             
             Debug.Log("Detected loot: " + loot.name);
             Debug.Log("Loot position: " + lootPosition);
