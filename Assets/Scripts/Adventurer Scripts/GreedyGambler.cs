@@ -43,8 +43,10 @@ public class GreedyGambler : MonoBehaviour
             Debug.Log("Loot position: " + lootPosition);
         }
     }
+    
+    
 
-    private void Start()
+    void Start()
     {
         movement = GetComponent<MovementScript>();
         stats = GetComponent<StatScript>();
