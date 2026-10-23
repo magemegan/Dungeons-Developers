@@ -391,7 +391,7 @@ public class MovementScript: MonoBehaviour
         return neighbors;
     }
 
-    private int GetDistance(Vector3Int a, Vector3Int b)
+    public int GetDistance(Vector3Int a, Vector3Int b)
     {
         return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
     }
@@ -623,24 +623,30 @@ public class MovementScript: MonoBehaviour
 
     public void MoveTowardChest(Vector3Int chestCell, int speed)
     {
-        Vector3Int startCell =
-            tilemap.WorldToCell(transform.position);
+        // Find a path from the adventurer to the chest.
+        Vector3Int startCell = tilemap.WorldToCell(transform.position);
 
         currentPath = FindPath(startCell, chestCell);
         pathIndex = 0;
 
         if (currentPath == null)
         {
-            target = null;
+            Debug.LogWarning(name + " could not find a path to the chest.");
             return;
         }
 
-        int maxTilesThisTurn = Mathf.Min(speed, currentPath.Count);
-
-        if (target == null)
+        // Already at the target.
+        if (currentPath.Count == 0)
         {
-            GameObject targetObject = new GameObject("Target");
-            target = targetObject.transform;
+            Debug.Log(name + " is already at the chest.");
+            return;
         }
+
+        // Set the movement budget for this turn.
+        combatMovesRemaining = Mathf.Min(speed, currentPath.Count);
+
+        // Start combat movement.
+        combatMoving = true;
+        StartCoroutine(MoveOnCombatPath());
     }
 }

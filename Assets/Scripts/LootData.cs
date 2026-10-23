@@ -14,7 +14,7 @@ public class LootData : MonoBehaviour
 
     void Awake()
     {
-        int randomValue = Random.Range(minValue, maxValue);
+        int randomValue = Random.Range(minValue, maxValue + 1);
         value = randomValue;
     }
 }
