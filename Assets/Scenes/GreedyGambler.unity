@@ -250,7 +250,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33c395c28673b8c4495306d2d35379dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatScript
-  maxHealth: 1
+  maxHealth: 5
   speed: 5
   perception: 5
   inventory: []
@@ -362,6 +362,7 @@ MonoBehaviour:
     m_Bits: 64
   floorTilemap: {fileID: 8329695624471161992}
   attackDamage: 3
+  stats: {fileID: 0}
 --- !u!114 &684620896
 MonoBehaviour:
   m_ObjectHideFlags: 0

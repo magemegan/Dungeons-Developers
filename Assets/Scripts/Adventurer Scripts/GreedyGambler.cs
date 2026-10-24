@@ -83,9 +83,7 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
             return;
         
         turnIsActive = true;
-
-        Debug.Log(name + " started their turn");
-
+        
         DecideAction();
     }
     
@@ -123,7 +121,7 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
         }
         
         Chest bestChest = FindBestChest();
-        if (bestChest == null)
+        if (bestChest != null)
         {
             Debug.Log("Gambler moving towards loot");
             StartCoroutine(MoveToLoot(bestChest));
