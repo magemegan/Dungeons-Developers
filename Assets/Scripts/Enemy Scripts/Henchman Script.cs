@@ -10,9 +10,10 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
     {
         FindingEnemy,
         FollowingEnemy,
-        Protecting,
         Panic
     }
+
+    private HenchmanState state;
 
     // References
     private StatScript stats;
@@ -24,6 +25,12 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
     [SerializeField] private GameObject targetEnemy;
     [SerializeField] private float findDistance = 12f;
     [SerializeField] private float protectDistance = 2f;
+    [SerializeField] private float attackDamage = 1f;
+
+    //private int panicField = 2;
+    // ^ panicking henchman will pick a cell and go to it as long as it is not within panicField spaces of the adventurer
+
+    private GameObject targetPlayer;
 
     private void Awake()
     {
@@ -44,13 +51,13 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
 
     /* 
      NEED:
-        - henchman actions enum
-        - henchman states enum? alone, with enemy?
             - if with enemy: have to continuously follow the enemy's movement
         - if adventurer is within protectDistance, start combat
         - find all enemies in room, find enemy with highest health
         - find closest enemy
         - PANIC
+        - check if adjacent to target enemy
+            - if not -- move to adjacent position to enemy
      */
 
     // i'm going to steal detector.CheckForEnemies -- henchman checks for adventurers, if adventurer within protectDistance, start combat
@@ -62,6 +69,19 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
         List<GameObject> equalStrongest = new List<GameObject>();
 
         List<GameObject> enemies = FindEnemies();
+        //Debug.Log(enemies.Count + " enemy, it is " + enemies[0].name);
+
+        if (enemies == null || enemies.Count == 0)
+        {
+            stats.SetSpeed(3);
+            state = HenchmanState.Panic;
+            targetEnemy = null;
+            //Panic();
+            Debug.Log("There are no enemies. state: " + state);
+            return null;
+        }
+
+        stats.SetSpeed(5);
 
         foreach(GameObject enemy in enemies)
         {
@@ -110,13 +130,18 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
         movement.SetTarget(strongestEnemy.transform.position);
         targetEnemy = strongestEnemy;
         Debug.Log("strongest enemy: " + strongestEnemy.name);
-        //movement.MoveTowardsCombatTarget(strongestEnemy.transform.position);
+        movement.MoveTowardsTarget(strongestEnemy.transform.position);
         return strongestEnemy;
     }
 
     private List<GameObject> FindEnemies()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag(tag);
+
+        if(enemies.Length == 0)
+        {
+            return null;
+        }
 
         Vector3Int myCell = tilemap.WorldToCell(transform.position);
 
@@ -127,16 +152,18 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
             Vector3Int enemyCell = tilemap.WorldToCell(enemy.transform.position);
 
             int distance = Mathf.Abs(myCell.x - enemyCell.x) + Mathf.Abs(myCell.y - enemyCell.y);
-
-            if(distance <= findDistance)
+            if(enemy.activeInHierarchy)
             {
-                enemiesInRange.Add(enemy);
+                if(enemy.GetComponent<HenchmanScript>())
+                {
+                    continue;
+                }
+                if(distance <= findDistance)
+                {
+                    enemiesInRange.Add(enemy);
+                }
             }
-        }
-
-        if(enemiesInRange.Count == 0)
-        {
-            // PANIC !!!!
+            
         }
 
         return enemiesInRange;
@@ -144,20 +171,94 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
 
 
 
-    private void Panic()
+    //private void Panic()
+    //{
+    //    Debug.Log("I'M FREAKING OUT!!!!!!");
+    //    // "move in direction that increases distance between itself and adventurers, with 20% chance of moving in a suboptimal direction"
+    //}
+
+    private bool IsAdjacent(GameObject target)
     {
-        // "move in direction that increases distance between itself and adventurers, with 20% chance of moving in a suboptimal direction"
+        Vector3Int myCell = tilemap.WorldToCell(transform.position);
+        Vector3Int targetCell = tilemap.WorldToCell(target.transform.position);
+
+        int distance = movement.GetDistance(myCell, targetCell);
+        if(distance == 1)
+        {
+            return true;
+        } else
+        {
+            return false;
+        }
     }
 
     public void StartTurn()
     {
-        Debug.Log("Henchman turn starts!");
-
-        if(targetEnemy.GetComponent<StatScript>().GetHealth() < targetEnemy.GetComponent<StatScript>().GetMaxHealth())
+        Debug.Log("Henchman turn starts! state: " + state);
+        if(state != HenchmanState.Panic)
         {
-            //check to make sure this is still the strongest enemy -- if not, jump ship to the new strongest
-            FindStrongestEnemy();
-            movement.MoveTowardsCombatTarget(targetEnemy.transform.position);
+            if(targetEnemy.GetComponent<StatScript>().GetHealth() < targetEnemy.GetComponent<StatScript>().GetMaxHealth())
+            {
+                //check to make sure this is still the strongest enemy -- if not, jump ship to the new strongest
+                FindStrongestEnemy();
+                if(targetEnemy != null)
+                {
+                    if (!IsAdjacent(targetEnemy))
+                    {
+                        movement.MoveTowardsCombatTarget(targetEnemy.transform.position);
+                        state = HenchmanState.FindingEnemy;
+                    }
+                    else
+                    {
+                        state = HenchmanState.FollowingEnemy;
+                    }
+                }
+            }
+
+            if(state == HenchmanState.FollowingEnemy)
+            {
+                targetPlayer = targetEnemy.GetComponent<DetectorScript>().GetClosestOpponent();
+                Attack();
+            }
+
+            EndTurn();
+        } else if(state == HenchmanState.Panic)
+        {
+            //i'm freaking out!!!!!!
+            targetPlayer = detector.GetClosestOpponent();
+            movement.Panic(targetPlayer.transform.position, stats.GetSpeed());
+            EndTurn();
+        }
+        
+    }
+
+    private void Attack()
+    {
+        Debug.Log("Henchman is trying to attack! state: " + state);
+        if (targetPlayer == null)
+        {
+            targetPlayer = targetEnemy.GetComponent<DetectorScript>().GetClosestOpponent();
+        }
+
+        if (targetPlayer == null)
+        {
+            return;
+        }
+
+        if (IsAdjacent(targetPlayer))
+        {
+            StatScript playerStats =
+                targetPlayer.GetComponent<StatScript>();
+
+            if (playerStats != null)
+            {
+                playerStats.TakeDamage(attackDamage);
+            }
+        }
+        else
+        {
+            // If too far go to adventurer
+            movement.MoveTowardsCombatTarget(targetPlayer.transform.position);
         }
     }
 

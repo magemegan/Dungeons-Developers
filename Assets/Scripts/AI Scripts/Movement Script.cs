@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
+using TMPro;
+using static UnityEngine.Random;
 
 public class MovementScript: MonoBehaviour
 {
@@ -490,8 +492,68 @@ public class MovementScript: MonoBehaviour
         StartCoroutine(MoveOnCombatPath());
     }
 
+    // for henchman -- IDK IF THERE'S ALREADY A WAY TO MOVE TOWARDS TARGET WITHOUT COMBAT MOVEMENT LIMIT
+    public void MoveTowardsTarget(Vector3 targetPosition)
+    {
+        // Already moving
+        if (isMoving || combatMoving)
+            return;
 
+        if (tilemap == null)
+        {
+            Debug.LogError(name + " has no Tilemap assigned!");
+            return;
+        }
 
+        if (stats == null)
+        {
+            Debug.LogError(name + " has no StatScript!");
+            return;
+        }
+
+        // Path to target
+        Vector3Int startCell = tilemap.WorldToCell(transform.position);
+        Vector3Int targetCell = tilemap.WorldToCell(targetPosition);
+
+        List<Vector3Int> bestPath = null;
+
+        foreach (Vector3Int neighbor in GetNeighbors(targetCell))
+        {
+            if (!tilemap.HasTile(neighbor))
+                continue;
+
+            List<Vector3Int> candidatePath = FindPath(startCell, neighbor);
+
+            if (candidatePath != null &&
+                (bestPath == null || candidatePath.Count < bestPath.Count))
+            {
+                bestPath = candidatePath;
+            }
+        }
+
+        // No path
+        if (bestPath == null)
+        {
+            Debug.LogWarning(name + " could not find a path to a tile next to the target.");
+            return;
+        }
+
+        // Already next to the target
+        if (bestPath.Count == 0)
+        {
+            Debug.Log(name + " is already next to the target.");
+            return;
+        }
+
+        currentPath = bestPath;
+        pathIndex = 0;
+        //combatMovesRemaining = stats.GetSpeed();
+
+        //// Limit movement to the character's speed.
+        //combatMoving = true;
+
+        StartCoroutine(MoveOnPath());
+    }
 
 
 
@@ -523,6 +585,26 @@ public class MovementScript: MonoBehaviour
         target = null;
 
         Debug.Log(name + " finished combat movement.");
+    }
+
+    // it's jaime again. SORRY IF THERES ALREADY A WAY TO DO THIS
+    private IEnumerator MoveOnPath()
+    {
+        while (currentPath != null && pathIndex < currentPath.Count)
+        {
+            Vector3Int nextCell = currentPath[pathIndex];
+            Vector3Int currentCell = tilemap.WorldToCell(transform.position);
+
+            Vector3Int direction = nextCell - currentCell;
+
+            yield return StartCoroutine(MoveDirection(direction));
+        }
+
+        // Combat movement is finished
+        currentPath = null;
+        target = null;
+
+        Debug.Log(name + " finished movement.");
     }
 
 
@@ -648,5 +730,35 @@ public class MovementScript: MonoBehaviour
         // Start combat movement.
         combatMoving = true;
         StartCoroutine(MoveOnCombatPath());
+    }
+
+    //for the henchman
+    public void Panic(Vector3 opponent, int speed)
+    {
+        Debug.Log("I'M FREAKING OUT!!!!!!!");
+        //ok hang on new plan
+        // - find what direction the opponent is in
+        // - randomly get a cell in an opposite direction within movement distance
+        // - go there (call movetowardscombattarget)
+
+        //randomly generate a cell thats +- [speed] cells from x and y of current cell.
+        // if generated cell distance from opponent > current cell distance from opponent, go there
+        // else, generate a new one until it's further from the opponent than u are right now.
+
+        Vector3Int oppCell = tilemap.WorldToCell(opponent);
+        Vector3Int myCell = tilemap.WorldToCell(transform.position);
+        Vector3Int genCell = new();
+
+        while(GetDistance(genCell, oppCell) < GetDistance(myCell, oppCell))
+        {
+            int cellX = Random.Range(myCell.x - speed, myCell.x + speed + 1);
+            int cellY = Random.Range(myCell.y - speed, myCell.y + speed + 1);
+            //int cellZ = Random.Range(myCell.z - speed, myCell.z + speed + 1);
+            genCell = new Vector3Int(cellX, cellY);
+        }
+
+        MoveTowardsCombatTarget(genCell);
+
+        Debug.Log(name + " is done panicking for the moment.");
     }
 }
