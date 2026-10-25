@@ -13,6 +13,7 @@ public class CombatManager : MonoBehaviour
     private bool isStartingTurn;
     [SerializeField] private float delay = 1f;
 
+    [SerializeField] private CombatIntroUI combatIntroUI;
     public List<GameObject> GetCombatants() { return combatants; }
 
     private void Awake()
@@ -26,6 +27,11 @@ public class CombatManager : MonoBehaviour
         if (IsInCombat)
             return;
 
+        if (CombatIntroUI.Instance != null)
+        {
+            CombatIntroUI.Instance.StartCombatEffect();
+        }
+        
         IsInCombat = true;
         GameManager.Instance.CurrentState = GameState.Combat;
 
@@ -40,6 +46,7 @@ public class CombatManager : MonoBehaviour
         Debug.Log(adventurer.name + " is fighting " + enemy.name);
 
         StartCoroutine(StartTurn(adventurer));
+        
     }
 
     private IEnumerator StartTurn(GameObject combatant)
@@ -153,7 +160,12 @@ public class CombatManager : MonoBehaviour
         IsInCombat = false;
 
         GameManager.Instance.CurrentState = GameState.Exploration;
-
+        
+        if (CombatIntroUI.Instance != null)
+        {
+            CombatIntroUI.Instance.EndCombatEffect();
+        }
+        
         Debug.Log("COMBAT ENDED!");
     }
 

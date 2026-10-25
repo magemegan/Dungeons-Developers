@@ -32,6 +32,12 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
         CollectingLoot,
         Attacking
     }
+    private enum ActionType
+    {
+        Loot,
+        Attack,
+        Defend
+    }
 
     void Awake()
     {
@@ -57,25 +63,6 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
             state = AgentState.Combat;
         }
     }
-
-    /*void CheckForLoot()
-    {
-        Collider2D[] nearbyLoot = Physics2D.OverlapCircleAll(transform.position, lootRadius, lootLayer);
-
-        foreach (Collider2D loot in nearbyLoot)
-        {
-            Vector3 lootPosition = loot.transform.position;
-            tilePosition = floorTilemap.WorldToCell(lootPosition);
-            
-            tilesToChest = movement.GetTilesToChest(tilePosition);
-            // find the highest value chest then return its position
-            
-            
-            Debug.Log("Detected loot: " + loot.name);
-            Debug.Log("Loot position: " + lootPosition);
-        }
-    }
-    */
     
     public void StartTurn()
     {
@@ -94,42 +81,62 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
 
     public void DecideAction()
     {
-        Debug.Log("Base Adventurer is deciding their action");
-
         if (!turnIsActive)
             return;
-        
-        if (movement == null)
-        {
-            Debug.LogError(name + ": MovementScript is missing!", this);
-            FinishTurn();
-            return;
-        }
 
-        if (stats == null)
-        {
-            Debug.LogError(name + ": StatScript is missing!", this);
-            FinishTurn();
-            return;
-        }
-
-        if (detector == null)
-        {
-            Debug.LogError(name + ": DetectorScript is missing!", this);
-            FinishTurn();
-            return;
-        }
-        
+        // Find the best available loot target.
         Chest bestChest = FindBestChest();
-        if (bestChest != null)
+
+        // Find the best available opponent.
+        GameObject bestEnemy = detector != null
+            ? detector.GetClosestOpponent()
+            : null;
+
+        // Calculate the utility of each action.
+        float lootUtility = CalculateLootUtility(bestChest);
+        float attackUtility = CalculateAttackUtility(bestEnemy);
+        //float defendUtility = CalculateDefendUtility();
+
+        Debug.Log(
+            $"Utilities for {name}: " +
+            $"Loot = {lootUtility:F2}, " +
+            $"Attack = {attackUtility:F2}"
+            //$"Defend = {defendUtility:F2}"
+        );
+
+        // Begin with the highest-scoring action.
+        ActionType chosenAction = ActionType.Attack;
+        float highestUtility = attackUtility;
+
+        if (lootUtility > highestUtility)
         {
-            Debug.Log("Gambler moving towards loot");
-            StartCoroutine(MoveToLoot(bestChest));
+            highestUtility = lootUtility;
+            chosenAction = ActionType.Loot;
         }
-        else
+
+        /*if (defendUtility > highestUtility)
         {
-            Debug.Log("Gambler is starting to attack");
-            StartCoroutine(Attack());
+            highestUtility = defendUtility;
+            chosenAction = ActionType.Defend;
+        }*/
+
+        // Execute the chosen action.
+        switch (chosenAction)
+        {
+            case ActionType.Loot:
+                if (bestChest != null)
+                    StartCoroutine(MoveToLoot(bestChest));
+                else
+                    StartCoroutine(Attack());
+                break;
+
+            case ActionType.Attack:
+                StartCoroutine(Attack());
+                break;
+
+            case ActionType.Defend:
+                //StartCoroutine(Defend());
+                break;
         }
     }
 
@@ -148,24 +155,24 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
         {
             Chest chest = loot.GetComponentInParent<Chest>();
 
-            if (chest != null)
+            if (chest == null)
                 continue;
+            
             Vector3Int chestTile = floorTilemap.WorldToCell(chest.transform.position);
             int distance = movement.GetDistance(floorTilemap.WorldToCell(transform.position), chestTile);
             
             // Doesn't select chests we cannot reach this turn
-            if (distance < speed)
+            if (distance > speed)
                 continue;
 
             float value = GetLootValue(chest);
 
-            float score = value / (distance + 1f);
+            float utility = CalculateLootUtility(value, distance);
 
-            if (score > bestScore)
+            if (utility > bestScore)
             {
-                bestScore = score;
+                bestScore = utility;
                 bestChest = chest;
-                targetTile = chestTile;
             }
         }
         
@@ -189,7 +196,7 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
 
         if (chest == null)
         {
-            //FinishTurn();
+            FinishTurn();
             yield break;
         }
 
@@ -216,7 +223,7 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
                 Debug.Log(name + " finished moving toward the chest.");
             }
 
-           // FinishTurn();
+           FinishTurn();
         }
     }
 
@@ -243,15 +250,96 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
         }
         
         yield return null;
-        //FinishTurn();
+        FinishTurn();
+    }
+    
+    private float CalculateLootUtility(float value, int distance)
+    {
+        if (distance < 0)
+            return float.MinValue;
+
+        return value / (distance + 1f);
+    }
+
+    private float CalculateLootUtility(Chest chest)
+    {
+        if (chest == null)
+        {
+            Debug.LogWarning(name + ": No chest was found.");
+            return float.MinValue;
+        }
+
+        if (movement == null)
+        {
+            Debug.LogError(name + ": MovementScript is missing.");
+            return float.MinValue;
+        }
+
+        if (floorTilemap == null)
+        {
+            Debug.LogError(name + ": Floor Tilemap is missing.");
+            return float.MinValue;
+        }
+
+        LootData lootData = chest.GetComponent<LootData>();
+
+        if (lootData == null)
+        {
+            Debug.LogError(chest.name + ": LootData is missing.");
+            return float.MinValue;
+        }
+
+        Vector3Int chestTile =
+            floorTilemap.WorldToCell(chest.transform.position);
+
+        int distance = movement.GetTilesToChest(chestTile);
+
+        Debug.Log($"{name}: Chest={chest.name}, " +
+                  $"Value={lootData.getValue()}, Distance={distance}");
+
+        if (distance < 0)
+        {
+            Debug.LogWarning(name + ": No path to chest.");
+            return float.MinValue;
+        }
+
+        float lootValue = lootData.getValue();
+        float utility = lootValue / (distance + 1f);
+
+        Debug.Log($"{name}: Loot utility = {utility}");
+
+        return utility;
+    }
+    private float CalculateAttackUtility(GameObject enemy)
+    {
+        if (enemy == null)
+            return float.MinValue;
+
+        StatScript enemyStats = enemy.GetComponent<StatScript>();
+
+        if (enemyStats == null)
+            return float.MinValue;
+
+        float utility = attackDamage;
+
+        // Bonus for finishing off a weakened enemy.
+        if (enemyStats.GetHealth() <= attackDamage)
+        {
+            utility += 3f;
+        }
+
+        return utility;
     }
 
     private void FinishTurn()
     {
+        if (!turnIsActive)
+            return;
+        
         turnIsActive = false;
         state = AgentState.Combat;
         
-        CombatManager.Instance.EndTurn(gameObject);
+        EndTurn();
     }
 
     private void OnDrawGizmosSelected()
