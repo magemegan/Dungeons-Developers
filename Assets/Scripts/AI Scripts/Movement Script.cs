@@ -492,7 +492,7 @@ public class MovementScript: MonoBehaviour
         StartCoroutine(MoveOnCombatPath());
     }
 
-    // for henchman -- IDK IF THERE'S ALREADY A WAY TO MOVE TOWARDS TARGET WITHOUT COMBAT MOVEMENT LIMIT
+    // for henchman move without combat limit
     public void MoveTowardsTarget(Vector3 targetPosition)
     {
         // Already moving
@@ -587,7 +587,7 @@ public class MovementScript: MonoBehaviour
         Debug.Log(name + " finished combat movement.");
     }
 
-    // it's jaime again. SORRY IF THERES ALREADY A WAY TO DO THIS
+    // just a non-combat limited version of moveoncombatpath
     private IEnumerator MoveOnPath()
     {
         while (currentPath != null && pathIndex < currentPath.Count)
@@ -753,12 +753,9 @@ public class MovementScript: MonoBehaviour
         {
             int cellX = Random.Range(myCell.x - speed, myCell.x + speed + 1);
             int cellY = Random.Range(myCell.y - speed, myCell.y + speed + 1);
-            //int cellZ = Random.Range(myCell.z - speed, myCell.z + speed + 1);
             genCell = new Vector3Int(cellX, cellY);
         }
 
         MoveTowardsCombatTarget(genCell);
-
-        Debug.Log(name + " is done panicking for the moment.");
     }
 }

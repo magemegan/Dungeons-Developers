@@ -5,7 +5,6 @@ using UnityEngine.Tilemaps;
 
 public class HenchmanScript : MonoBehaviour, AICombatBase
 {
-    // i don't know for sure that i need this but it's here
     private enum HenchmanState
     {
         FindingEnemy,
@@ -13,7 +12,7 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
         Panic
     }
 
-    private HenchmanState state;
+    private HenchmanState state = HenchmanState.FindingEnemy;
 
     // References
     private StatScript stats;
@@ -26,9 +25,6 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
     [SerializeField] private float findDistance = 12f;
     [SerializeField] private float protectDistance = 2f;
     [SerializeField] private float attackDamage = 1f;
-
-    //private int panicField = 2;
-    // ^ panicking henchman will pick a cell and go to it as long as it is not within panicField spaces of the adventurer
 
     private GameObject targetPlayer;
 
@@ -46,22 +42,15 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
 
     void Update()
     {
-        
+        if(!IsAdjacent(targetEnemy))
+        {
+            movement.MoveTowardsTarget(targetEnemy.transform.position);
+            state = HenchmanState.FindingEnemy;
+        } else
+        {
+            state = HenchmanState.FollowingEnemy;
+        }
     }
-
-    /* 
-     NEED:
-            - if with enemy: have to continuously follow the enemy's movement
-        - if adventurer is within protectDistance, start combat
-        - find all enemies in room, find enemy with highest health
-        - find closest enemy
-        - PANIC
-        - check if adjacent to target enemy
-            - if not -- move to adjacent position to enemy
-     */
-
-    // i'm going to steal detector.CheckForEnemies -- henchman checks for adventurers, if adventurer within protectDistance, start combat
-
     private GameObject FindStrongestEnemy()
     {
         GameObject strongestEnemy = null;
@@ -69,14 +58,12 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
         List<GameObject> equalStrongest = new List<GameObject>();
 
         List<GameObject> enemies = FindEnemies();
-        //Debug.Log(enemies.Count + " enemy, it is " + enemies[0].name);
 
         if (enemies == null || enemies.Count == 0)
         {
             stats.SetSpeed(3);
             state = HenchmanState.Panic;
             targetEnemy = null;
-            //Panic();
             Debug.Log("There are no enemies. state: " + state);
             return null;
         }
@@ -169,16 +156,13 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
         return enemiesInRange;
     }
 
-
-
-    //private void Panic()
-    //{
-    //    Debug.Log("I'M FREAKING OUT!!!!!!");
-    //    // "move in direction that increases distance between itself and adventurers, with 20% chance of moving in a suboptimal direction"
-    //}
-
     private bool IsAdjacent(GameObject target)
     {
+        if(target == null)
+        {
+            return false;
+        }
+
         Vector3Int myCell = tilemap.WorldToCell(transform.position);
         Vector3Int targetCell = tilemap.WorldToCell(target.transform.position);
 
