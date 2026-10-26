@@ -1020,11 +1020,11 @@ PrefabInstance:
       objectReference: {fileID: 8329695624471161992}
     - target: {fileID: 4238888482540351880, guid: 5bd4a64f3cacfe34e85af1e070a15e0f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -6
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 4238888482540351880, guid: 5bd4a64f3cacfe34e85af1e070a15e0f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -14
+      value: -16
       objectReference: {fileID: 0}
     - target: {fileID: 4238888482540351880, guid: 5bd4a64f3cacfe34e85af1e070a15e0f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1216,26 +1216,6 @@ PrefabInstance:
       propertyPath: tilemap
       value: 
       objectReference: {fileID: 8329695624471161992}
-    - target: {fileID: 6757073619776576872, guid: 80e72dd0a0a1eb748b06c6f45b8839ed, type: 3}
-      propertyPath: m_Constraints
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 6850039668783975109, guid: 80e72dd0a0a1eb748b06c6f45b8839ed, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 7796456629123218929, guid: eb423fac40a457e42a6d473ed8646c08, type: 3}
-    - target: {fileID: 6850039668783975109, guid: 80e72dd0a0a1eb748b06c6f45b8839ed, type: 3}
-      propertyPath: m_Color.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6850039668783975109, guid: 80e72dd0a0a1eb748b06c6f45b8839ed, type: 3}
-      propertyPath: m_Color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6850039668783975109, guid: 80e72dd0a0a1eb748b06c6f45b8839ed, type: 3}
-      propertyPath: m_Color.r
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8073450047508508029, guid: 80e72dd0a0a1eb748b06c6f45b8839ed, type: 3}
       propertyPath: floorTilemap
       value: 

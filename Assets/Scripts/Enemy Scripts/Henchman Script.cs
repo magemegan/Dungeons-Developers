@@ -37,6 +37,24 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
 
     void Start()
     {
+        if (movement == null)
+        {
+            movement = GetComponent<MovementScript>();
+        }
+
+        if (movement == null)
+        {
+            Debug.LogError("Henchman is missing its MovementScript!");
+            return;
+        }
+
+        if (targetEnemy == null)
+        {
+            Debug.LogWarning("Henchman has no target enemy.");
+            return;
+        }
+
+        movement.MoveTowardsTarget(targetEnemy.transform.position);
         FindStrongestEnemy();
     }
 
