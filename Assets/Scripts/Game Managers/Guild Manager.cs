@@ -19,6 +19,8 @@ public class GuildManager : MonoBehaviour
         }
 
         Instance = this;
+
+        Deposit(3); // For testing
     }
 
     public void Deposit(int amount)

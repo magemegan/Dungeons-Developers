@@ -24,8 +24,8 @@ public class CoboldScript : MonoBehaviour, AICombatBase
     // A hypothetical state for Alpha-Beta
     private class CoboldState
     {
-        public bool hasTreasure;
-        public bool playerHasTreasure;
+        public bool hasGold;
+        public bool guildHasGold;
         public bool atDen;
 
         public float coboldHealth;
@@ -55,7 +55,8 @@ public class CoboldScript : MonoBehaviour, AICombatBase
     // target
     private GameObject targetPlayer;
 
-    //list
+    // loot
+    private int goldStolen = 0;
     private List<GameObject> stolenItems = new List<GameObject>();
     private readonly List<GameObject> denLoot = new List<GameObject>();
 
@@ -240,7 +241,7 @@ public class CoboldScript : MonoBehaviour, AICombatBase
         Vector3Int denCell =
             movement.GetTilemap().WorldToCell(den.position);
 
-        bool playerHasTreasure = false;
+        bool guildHasGold = false;
         float playerHealth = 0f;
         float playerDistance = 0f;
 
@@ -251,7 +252,7 @@ public class CoboldScript : MonoBehaviour, AICombatBase
 
             if (playerStats != null)
             {
-                playerHasTreasure = playerStats.GetInventory().Count > 0;
+                guildHasGold = GuildManager.Instance.TotalGold > 0;
 
                 playerHealth = playerStats.GetHealth();
 
@@ -263,8 +264,8 @@ public class CoboldScript : MonoBehaviour, AICombatBase
 
         return new CoboldState
         {
-            hasTreasure = stolenItems.Count > 0,
-            playerHasTreasure = playerHasTreasure,
+            hasGold = stolenItems.Count > 0,
+            guildHasGold = guildHasGold,
             atDen = coboldCell == denCell,
             coboldHealth = stats.GetHealth(),
             playerHealth = playerHealth,
@@ -277,13 +278,13 @@ public class CoboldScript : MonoBehaviour, AICombatBase
     {
         float utility = 0f;
 
-        if (state.hasTreasure)
+        if (state.guildHasGold)
             utility += 50f;
 
         if (state.atDen)
             utility += 50f;
 
-        if (state.playerHasTreasure)
+        if (state.guildHasGold)
             utility += 20f;
 
         utility += state.coboldHealth;
@@ -313,12 +314,12 @@ public class CoboldScript : MonoBehaviour, AICombatBase
             return new[] { CoboldAction.Flee };
 
         // Carrying loot makes cobold go to den
-        if (state.hasTreasure)
+        if (state.hasGold)
             return new[] { CoboldAction.ReturnToDen };
 
         List<CoboldAction> actions = new List<CoboldAction>();
 
-        if (state.playerHasTreasure)
+        if (state.guildHasGold)
             actions.Add(CoboldAction.Steal);
 
         actions.Add(CoboldAction.ReturnToDen);
@@ -348,10 +349,10 @@ public class CoboldScript : MonoBehaviour, AICombatBase
         switch (action)
         {
             case CoboldAction.Steal:
-                if (result.playerHasTreasure && result.distanceToPlayer <= stealDistance)
+                if (result.guildHasGold && result.distanceToPlayer <= stealDistance)
                 {
-                    result.hasTreasure = true;
-                    result.playerHasTreasure = false;
+                    result.hasGold = true;
+                    result.guildHasGold = false;
                 }
                 else
                 {
@@ -402,8 +403,8 @@ public class CoboldScript : MonoBehaviour, AICombatBase
     {
         return new CoboldState
         {
-            hasTreasure = state.hasTreasure,
-            playerHasTreasure = state.playerHasTreasure,
+            hasGold = state.hasGold,
+            guildHasGold = state.guildHasGold,
             atDen = state.atDen,
             coboldHealth = state.coboldHealth,
             playerHealth = state.playerHealth,
@@ -426,19 +427,13 @@ public class CoboldScript : MonoBehaviour, AICombatBase
 
     private void TryToSteal()
     {
-        if (targetPlayer == null)
+        if (GuildManager.Instance.TotalGold <= 0)
         {
+            Debug.Log(name + " tried to steal gold, but there is no gold.");
             return;
         }
 
-        StatScript playerStats = targetPlayer.GetComponent<StatScript>();
-
-        if (playerStats == null)
-            return;
-
-        List<GameObject> inventory = playerStats.GetInventory();
-
-        if (inventory.Count == 0)
+        if (targetPlayer == null)
         {
             return;
         }
@@ -450,11 +445,10 @@ public class CoboldScript : MonoBehaviour, AICombatBase
             return;
         }
 
-        // Steal an item
-        GameObject stolenItem = inventory[0];
+        // Steal gold
+        GuildManager.Instance.Deposit(-1);
 
-        inventory.RemoveAt(0);
-        stolenItems.Add(stolenItem);
+        goldStolen += 1;
     }
 
     private void ReturnToDen()
