@@ -17,6 +17,10 @@ public class StatScript : MonoBehaviour
     public float GetHealth() { return health; }
     public float GetMaxHealth() { return maxHealth; }
     public int GetSpeed() { return speed; }
+    public void SetSpeed(int newSpeed)
+    {
+        speed = newSpeed;
+    }
     public float GetPerceptiom() { return perception; }
     public List<GameObject> GetInventory() { return inventory; }
 
