@@ -101,6 +101,8 @@ public class CoboldScript : MonoBehaviour, AICombatBase
 
         // Score possible actions
         currentAction = CoboldDecision();
+        
+        CombatLog.Instance.Log("Cobold chose action: " + currentAction);
 
         Debug.Log("Cobold chose action: " + currentAction);
 

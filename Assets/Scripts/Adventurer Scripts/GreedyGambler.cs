@@ -218,6 +218,8 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
         if (chest == null)
         {
             state = AgentState.CollectingLoot;
+            
+            CombatLog.Instance.Log(name + " collected the chest's loot.");
             Debug.Log(name + " collected the chest's loot.");
         }
         else
@@ -231,7 +233,8 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
     private IEnumerator Attack()
     {
         state = AgentState.Attacking;
-        
+
+        CombatLog.Instance.Log(gameObject.name + " attacks!");
         Debug.Log(gameObject.name + " attacks!");
 
         GameObject enemy = detector.GetClosestOpponent();

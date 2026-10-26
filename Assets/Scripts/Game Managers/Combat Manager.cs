@@ -42,6 +42,7 @@ public class CombatManager : MonoBehaviour
         StopMovement(enemy);
 
         Debug.Log("COMBAT STARTED!");
+        CombatLog.Instance.Log(adventurer.name + " is fighting " + enemy.name);
         Debug.Log(adventurer.name + " is fighting " + enemy.name);
 
         StartCoroutine(StartTurn(adventurer));
@@ -72,6 +73,8 @@ public class CombatManager : MonoBehaviour
 
         currentCombatant = combatant;
         isStartingTurn = true;
+        
+        CombatLog.Instance.Log(currentCombatant.name + "'s turn starts.");
 
         Debug.Log(currentCombatant.name + "'s turn starts.");
 
