@@ -123,7 +123,7 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
 
     private List<GameObject> FindEnemies()
     {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag(tag);
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
 
         if(enemies.Length == 0)
         {
