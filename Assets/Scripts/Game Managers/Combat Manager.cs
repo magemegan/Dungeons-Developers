@@ -13,7 +13,6 @@ public class CombatManager : MonoBehaviour
     private bool isStartingTurn;
     [SerializeField] private float delay = 1f;
 
-    [SerializeField] private CombatIntroUI combatIntroUI;
     public List<GameObject> GetCombatants() { return combatants; }
 
     private void Awake()

@@ -44,6 +44,7 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
         movement = GetComponent<MovementScript>();
         stats = GetComponent<StatScript>();
         detector = GetComponent<DetectorScript>();
+        speed = stats.GetSpeed();
     }
 
     void Start()
@@ -166,6 +167,8 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
                 continue;
 
             float value = GetLootValue(chest);
+            
+            Debug.Log($"Chest: {chest.name}, Gold: {value}, Distance: {distance}");
 
             float utility = CalculateLootUtility(value, distance);
 
@@ -211,20 +214,18 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
             yield return null;
         }
 
+       // Check whether the chest was collected or whether the agent simply reached it.
         if (chest == null)
         {
             state = AgentState.CollectingLoot;
-
-            Debug.Log(name + " collected chest's loot.");
+            Debug.Log(name + " collected the chest's loot.");
         }
         else
         {
-            {
-                Debug.Log(name + " finished moving toward the chest.");
-            }
-
-           FinishTurn();
+            Debug.Log(name + " finished moving toward the chest.");
         }
+
+        FinishTurn();
     }
 
     private IEnumerator Attack()
@@ -253,6 +254,7 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
         FinishTurn();
     }
     
+    // used for FindBestChest()
     private float CalculateLootUtility(float value, int distance)
     {
         if (distance < 0)
@@ -320,12 +322,13 @@ public class GreedyGambler : MonoBehaviour, AICombatBase
         if (enemyStats == null)
             return float.MinValue;
 
-        float utility = attackDamage;
+        // Attacking is normally a low priority.
+        float utility = 1f;
 
-        // Bonus for finishing off a weakened enemy.
+        // Only a small bonus for finishing off an enemy.
         if (enemyStats.GetHealth() <= attackDamage)
         {
-            utility += 3f;
+            utility += 1f;
         }
 
         return utility;
