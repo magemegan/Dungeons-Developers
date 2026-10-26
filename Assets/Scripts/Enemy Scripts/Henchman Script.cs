@@ -160,6 +160,7 @@ public class HenchmanScript : MonoBehaviour, AICombatBase
     {
         if(target == null)
         {
+            FindStrongestEnemy();
             return false;
         }
 
